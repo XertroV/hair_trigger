@@ -119,34 +119,34 @@ module HairTrigger
       migration_names = migrations.map(&:first)
       existing_triggers = migrations.map(&:last)
 
-      up_drop_triggers = []
-      up_create_triggers = []
-      down_drop_triggers = []
-      down_create_triggers = []
+      up_ht_drop_triggers = []
+      up_ht_create_triggers = []
+      down_ht_drop_triggers = []
+      down_ht_create_triggers = []
 
       # see which triggers need to be dropped
       existing_triggers.each do |existing|
         next if canonical_triggers.any?{ |t| t.prepared_name == existing.prepared_name }
-        up_drop_triggers.concat existing.drop_triggers
-        down_create_triggers << existing
+        up_ht_drop_triggers.concat existing.ht_drop_triggers
+        down_ht_create_triggers << existing
       end
 
       # see which triggers need to be added/replaced
       (canonical_triggers - existing_triggers).each do |new_trigger|
-        up_create_triggers << new_trigger
-        down_drop_triggers.concat new_trigger.drop_triggers
+        up_ht_create_triggers << new_trigger
+        down_ht_drop_triggers.concat new_trigger.ht_drop_triggers
         if existing = existing_triggers.detect{ |t| t.prepared_name == new_trigger.prepared_name }
           # it's not sufficient to rely on the new trigger to replace the old
           # one, since we could be dealing with trigger groups and the name
           # alone isn't sufficient to know which component triggers to remove
-          up_drop_triggers.concat existing.drop_triggers
-          down_create_triggers << existing
+          up_ht_drop_triggers.concat existing.ht_drop_triggers
+          down_ht_create_triggers << existing
         end
       end
 
-      return if up_drop_triggers.empty? && up_create_triggers.empty?
+      return if up_ht_drop_triggers.empty? && up_ht_create_triggers.empty?
 
-      migration_name = infer_migration_name(migration_names, up_create_triggers, up_drop_triggers)
+      migration_name = infer_migration_name(migration_names, up_ht_create_triggers, up_ht_drop_triggers)
       migration_version = infer_migration_version(migration_name)
       file_name = migration_path + '/' + migration_version + "_" + migration_name.underscore + ".rb"
       FileUtils.mkdir_p migration_path
@@ -157,25 +157,25 @@ module HairTrigger
 
 class #{migration_name} < ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]
   def up
-    #{(up_drop_triggers + up_create_triggers).map{ |t| t.to_ruby('    ') }.join("\n\n").lstrip}
+    #{(up_ht_drop_triggers + up_ht_create_triggers).map{ |t| t.to_ruby('    ') }.join("\n\n").lstrip}
   end
 
   def down
-    #{(down_drop_triggers + down_create_triggers).map{ |t| t.to_ruby('    ') }.join("\n\n").lstrip}
+    #{(down_ht_drop_triggers + down_ht_create_triggers).map{ |t| t.to_ruby('    ') }.join("\n\n").lstrip}
   end
 end
       RUBY
       file_name
     end
 
-    def infer_migration_name(migration_names, create_triggers, drop_triggers)
-      if create_triggers.size > 0
-        migration_base_name = "create trigger#{create_triggers.size > 1 ? 's' : ''} "
-        name_parts = create_triggers.map { |t| [t.options[:table], t.options[:events].join(" ")].join(" ") }.uniq
+    def infer_migration_name(migration_names, ht_create_triggers, ht_drop_triggers)
+      if ht_create_triggers.size > 0
+        migration_base_name = "ht create trigger#{ht_create_triggers.size > 1 ? 's' : ''} "
+        name_parts = ht_create_triggers.map { |t| [t.options[:table], t.options[:events].join(" ")].join(" ") }.uniq
         part_limit = 4
       else
-        migration_base_name = "drop trigger#{drop_triggers.size > 1 ? 's' : ''} "
-        name_parts = drop_triggers.map { |t| t.options[:table] }
+        migration_base_name = "ht drop trigger#{ht_drop_triggers.size > 1 ? 's' : ''} "
+        name_parts = ht_drop_triggers.map { |t| t.options[:table] }
         part_limit = 6
       end
 

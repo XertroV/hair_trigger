@@ -138,7 +138,7 @@
 
 ### 0.1.13
 
-* drop_trigger fix
+* ht_drop_trigger fix
 
 ### 0.1.12
 
@@ -161,7 +161,7 @@
 ### 0.1.7
 
 * Rails 3 support
-* Fix a couple manual create_trigger bugs
+* Fix a couple manual ht_create_trigger bugs
 
 ### 0.1.6
 

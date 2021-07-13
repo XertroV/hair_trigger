@@ -52,7 +52,7 @@ module HairTrigger
           stream.puts "  # WARNING: generating adapter-specific definition for #{name} due to a mismatch."
           stream.puts "  # either there's a bug in hairtrigger or you've messed up your migrations and/or db :-/"
         else
-          stream.puts "  # no candidate create_trigger statement could be found, creating an adapter-specific one"
+          stream.puts "  # no candidate ht_create_trigger statement could be found, creating an adapter-specific one"
         end
         if definition =~ /\n/
           stream.print "  execute(<<-SQL)\n#{definition.rstrip}\n  SQL\n\n"

@@ -9,13 +9,13 @@ module HairTrigger
         if source.is_a?(String)
           # schema.rb contents... because it's auto-generated and we know
           # exactly what it will look like, we can safely use a regex
-          source.scan(/^  create_trigger\(.*?\n  end\n\n/m).each do |match|
+          source.scan(/^  ht_create_trigger\(.*?\n  end\n\n/m).each do |match|
             trigger = instance_eval("generate_" + match.strip)
             triggers << trigger if options[:include_manual_triggers] || trigger.options[:generated]
           end
         else
           contents = File.read(source.filename)
-          return [] unless contents =~ /(create|drop)_trigger/
+          return [] unless contents =~ /ht_(create|drop)_trigger/
           sexps = RubyParser.for_current_ruby.parse(contents)
           # find the migration class
           sexps = [sexps] unless sexps[0] == :block
@@ -25,7 +25,7 @@ module HairTrigger
           sexps = sexps.detect{ |s| s.is_a?(Sexp) && (s[0] == :defs && s[1] && s[1][0] == :self && s[2] == :up || s[0] == :defn && s[1] == :up) }
           return [] unless sexps # no `up` method... unsupported `change` perhaps?
           sexps.each do |sexp|
-            next unless (method = extract_method_call(sexp)) && [:create_trigger, :drop_trigger].include?(method)
+            next unless (method = extract_method_call(sexp)) && [:ht_create_trigger, :ht_drop_trigger].include?(method)
             trigger = instance_eval("generate_" + generator.process(sexp))
             triggers << trigger if options[:include_manual_triggers] || trigger.options[:generated]
           end
@@ -47,7 +47,7 @@ module HairTrigger
         end
       end
 
-      def generate_create_trigger(*arguments)
+      def generate_ht_create_trigger(*arguments)
         arguments.unshift({}) if arguments.empty?
         arguments.unshift(nil) if arguments.first.is_a?(Hash)
         arguments.push({}) if arguments.size == 1
@@ -55,7 +55,7 @@ module HairTrigger
         ::HairTrigger::Builder.new(*arguments)
       end
 
-      def generate_drop_trigger(*arguments)
+      def generate_ht_drop_trigger(*arguments)
         options = arguments[2] || {}
         ::HairTrigger::Builder.new(arguments[0], options.update({:table => arguments[1], :drop => true}))
       end

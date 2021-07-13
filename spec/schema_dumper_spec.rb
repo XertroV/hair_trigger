@@ -18,15 +18,15 @@ describe "schema dumping" do
     context "without schema.rb" do
       it "should work" do
         schema_rb = dump_schema
-        schema_rb.should match(/create_trigger\("users_after_insert_row_when_new_name_bob__tr", :generated => true, :compatibility => 1\)/)
-        schema_rb.should match(/create_trigger\("users_after_update_row_when_new_name_joe__tr", :compatibility => 1\)/)
+        schema_rb.should match(/ht_create_trigger\("users_after_insert_row_when_new_name_bob__tr", :generated => true, :compatibility => 1\)/)
+        schema_rb.should match(/ht_create_trigger\("users_after_update_row_when_new_name_joe__tr", :compatibility => 1\)/)
       end
 
       it "should create adapter-specific triggers if no migrations exist" do
         FileUtils.rm_rf(Dir.glob('tmp/migrations/*rb'))
         schema_rb = dump_schema
-        schema_rb.should_not match(/create_trigger\(/)
-        schema_rb.should match(/no candidate create_trigger statement could be found, creating an adapter-specific one/)
+        schema_rb.should_not match(/ht_create_trigger\(/)
+        schema_rb.should match(/no candidate ht_create_trigger statement could be found, creating an adapter-specific one/)
       end
 
       it "should not dump triggers in migrations that haven't run" do
@@ -48,19 +48,19 @@ describe "schema dumping" do
       it 'should take in consideration active record schema dumper ignore_tables option with regexp' do
         ActiveRecord::SchemaDumper.ignore_tables = [/users/]
 
-        dump_schema.should_not match(/create_trigger/)
+        dump_schema.should_not match(/ht_create_trigger/)
       end
 
       it 'should take in consideration active record schema dumper ignore_tables option with string' do
         ActiveRecord::SchemaDumper.ignore_tables = ['users']
 
-        dump_schema.should_not match(/create_trigger/)
+        dump_schema.should_not match(/ht_create_trigger/)
       end
 
       it 'should take in consideration active record schema dumper ignore_tables option with partial string' do
         ActiveRecord::SchemaDumper.ignore_tables = ['user']
 
-        dump_schema.should match(/create_trigger/)
+        dump_schema.should match(/ht_create_trigger/)
       end
 
 
@@ -73,15 +73,15 @@ describe "schema dumping" do
 
       it "should work" do
         schema_rb = dump_schema
-        schema_rb.should match(/create_trigger\("users_after_insert_row_when_new_name_bob__tr", :generated => true, :compatibility => 1\)/)
-        schema_rb.should match(/create_trigger\("users_after_update_row_when_new_name_joe__tr", :compatibility => 1\)/)
+        schema_rb.should match(/ht_create_trigger\("users_after_insert_row_when_new_name_bob__tr", :generated => true, :compatibility => 1\)/)
+        schema_rb.should match(/ht_create_trigger\("users_after_update_row_when_new_name_joe__tr", :compatibility => 1\)/)
       end
 
       it "should still work even if migrations have been deleted" do
         FileUtils.rm_rf(Dir.glob('tmp/migrations/*rb'))
         schema_rb = dump_schema
-        schema_rb.should match(/create_trigger\("users_after_insert_row_when_new_name_bob__tr", :generated => true, :compatibility => 1\)/)
-        schema_rb.should match(/create_trigger\("users_after_update_row_when_new_name_joe__tr", :compatibility => 1\)/)
+        schema_rb.should match(/ht_create_trigger\("users_after_insert_row_when_new_name_bob__tr", :generated => true, :compatibility => 1\)/)
+        schema_rb.should match(/ht_create_trigger\("users_after_update_row_when_new_name_joe__tr", :compatibility => 1\)/)
       end
 
       it "should evaluate all migrations even if they haven't run" do
@@ -103,19 +103,19 @@ describe "schema dumping" do
       it 'should take in consideration active record schema dumper ignore_tables option with regexp' do
         ActiveRecord::SchemaDumper.ignore_tables = [/users/]
 
-        dump_schema.should_not match(/create_trigger/)
+        dump_schema.should_not match(/ht_create_trigger/)
       end
 
       it 'should take in consideration active record schema dumper ignore_tables option with string' do
         ActiveRecord::SchemaDumper.ignore_tables = ['users']
 
-        dump_schema.should_not match(/create_trigger/)
+        dump_schema.should_not match(/ht_create_trigger/)
       end
 
       it 'should take in consideration active record schema dumper ignore_tables option with partial string' do
         ActiveRecord::SchemaDumper.ignore_tables = ['user']
 
-        dump_schema.should match(/create_trigger/)
+        dump_schema.should match(/ht_create_trigger/)
       end
 
     end

@@ -1,6 +1,6 @@
 class ManualUserTrigger < ActiveRecord::Migration[5.0]
   def up
-    create_trigger(:compatibility => 1).
+    ht_create_trigger(:compatibility => 1).
         on("users").
         after(:update).
         where("NEW.name = 'joe'") do

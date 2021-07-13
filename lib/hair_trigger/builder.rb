@@ -39,7 +39,7 @@ module HairTrigger
       end
     end
 
-    def drop_triggers
+    def ht_drop_triggers
       all_names.map{ |name| self.class.new(name, {:table => options[:table], :drop => true}) }
     end
 
@@ -214,13 +214,13 @@ module HairTrigger
       prepare!
       raise GenerationError, "need to specify the table" unless options[:table]
       if options[:drop]
-        generate_drop_trigger
+        generate_ht_drop_trigger
       else
         raise GenerationError, "no actions specified" if @triggers && create_grouped_trigger? ? @triggers.any?{ |t| t.raw_actions.nil? } : raw_actions.nil?
         raise GenerationError, "need to specify the event(s) (:insert, :update, :delete)" if !options[:events] || options[:events].empty?
         raise GenerationError, "need to specify the timing (:before/:after)" unless options[:timing]
 
-        [generate_drop_trigger] +
+        [generate_ht_drop_trigger] +
         [case adapter_name
           when :sqlite
             generate_trigger_sqlite
@@ -237,7 +237,7 @@ module HairTrigger
     def to_ruby(indent = '', always_generated = true)
       prepare!
       if options[:drop]
-        str = "#{indent}drop_trigger(#{prepared_name.inspect}, #{options[:table].inspect}"
+        str = "#{indent}ht_drop_trigger(#{prepared_name.inspect}, #{options[:table].inspect}"
         str << ", :generated => true" if always_generated || options[:generated]
         str << ")"
       else
@@ -246,7 +246,7 @@ module HairTrigger
           str << actions_to_ruby("#{indent}  ") + "\n"
           str << "#{indent}end"
         else
-          str = "#{indent}create_trigger(#{prepared_name.inspect}"
+          str = "#{indent}ht_create_trigger(#{prepared_name.inspect}"
           str << ", :generated => true" if always_generated || options[:generated]
           str << ", :compatibility => #{@compatibility}"
           str << ").\n#{indent}    " + chained_calls_to_ruby(".\n#{indent}    ")
@@ -405,7 +405,7 @@ module HairTrigger
       end
     end
 
-    def generate_drop_trigger
+    def generate_ht_drop_trigger
       case adapter_name
         when :sqlite, :mysql
           "DROP TRIGGER IF EXISTS #{prepared_name};\n"

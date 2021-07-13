@@ -4,7 +4,7 @@
 
 class UserTrigger < ActiveRecord::Migration[5.0]
   def up
-    create_trigger("users_after_insert_row_when_new_name_bob__tr", :generated => true, :compatibility => 1).
+    ht_create_trigger("users_after_insert_row_when_new_name_bob__tr", :generated => true, :compatibility => 1).
         on("users").
         after(:insert).
         where("NEW.name = 'bob'") do
@@ -13,6 +13,6 @@ class UserTrigger < ActiveRecord::Migration[5.0]
   end
 
   def down
-    drop_trigger("users_after_insert_row_when_new_name_bob__tr", "users")
+    ht_drop_trigger("users_after_insert_row_when_new_name_bob__tr", "users")
   end
 end

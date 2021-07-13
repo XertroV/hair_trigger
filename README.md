@@ -61,7 +61,7 @@ BEGIN
 END;
 ```
 
-Note that these auto-generated `create_trigger` statements in the migration
+Note that these auto-generated `ht_create_trigger` statements in the migration
 contain the `:generated => true` option, indicating that they were created
 from the model definition. This is important, as the rake task will also
 generate appropriate drop/create statements for any model triggers that get
@@ -109,7 +109,7 @@ Required (but may be satisified by `before`/`after`). Possible values are `:inse
 #### nowrap(flag = true)
 PostgreSQL-specific option to prevent the trigger action from being wrapped in a `CREATE FUNCTION`. This is useful for executing existing triggers/functions directly, but is not compatible with the `security` setting nor can it be used with pre-9.0 PostgreSQL when supplying a `where` condition.
 
-Example: `trigger.after(:update).nowrap { "tsvector_update_trigger(...)" }`
+Example: `trigger.after(:update).nowrap { "tsvector_ht_update_trigger(...)" }`
 
 #### declare
 PostgreSQL-specific option for declaring variables for use in the
@@ -186,18 +186,18 @@ end
 
 ### Manual Migrations
 
-You can also manage triggers manually in your migrations via `create_trigger` and
-`drop_trigger`. They are a little more verbose than model triggers, and they can
+You can also manage triggers manually in your migrations via `ht_create_trigger` and
+`ht_drop_trigger`. They are a little more verbose than model triggers, and they can
 be more work since you need to figure out the up/down create/drop logic when
 you change things. A sample trigger:
 
 ```ruby
-create_trigger(:compatibility => 1).on(:users).after(:insert) do
+ht_create_trigger(:compatibility => 1).on(:users).after(:insert) do
   "UPDATE accounts SET user_count = user_count + 1 WHERE id = NEW.account_id;"
 end
 ```
 
-Because `create_trigger` may drop an existing trigger of the same name,
+Because `ht_create_trigger` may drop an existing trigger of the same name,
 you need to actually implement `up`/`down` methods in your migration
 (rather than `change`) so that it does the right thing when
 rolling back.
@@ -211,11 +211,11 @@ knowing which previous version generated the original trigger. You only need
 to worry about this for manual trigger migrations, as the model ones
 automatically take care of this. For your manual triggers you can either:
 
-* pass `:compatibility => x` to your `create_trigger` statement, where x is
+* pass `:compatibility => x` to your `ht_create_trigger` statement, where x is
   whatever HairTrigger::Builder.compatibility is (1 for this version).
 * set `HairTrigger::Builder.base_compatibility = x` in an initializer, where
   x is whatever HairTrigger::Builder.compatibility is. This is like doing the
-  first option on every `create_trigger`. Note that once the compatibility
+  first option on every `ht_create_trigger`. Note that once the compatibility
   changes, you'll need to set `:compatibility` on new triggers (unless you
   just redo all your triggers and bump the `base_compatibility`).
 
@@ -228,9 +228,9 @@ on any new triggers that you create.
 HairTrigger hooks into `rake db:schema:dump` (and rake tasks that call it) to
 make it trigger-aware. A newly generated schema.rb will contain:
 
-* `create_trigger` statements for any database triggers that exactly match a
-  `create_trigger` statement in an applied migration or in the previous
-  schema.rb file. this includes both generated and manual `create_trigger`
+* `ht_create_trigger` statements for any database triggers that exactly match a
+  `ht_create_trigger` statement in an applied migration or in the previous
+  schema.rb file. this includes both generated and manual `ht_create_trigger`
   calls.
 * adapter-specific `execute('CREATE TRIGGER..')` statements for any unmatched
   database triggers.
@@ -317,7 +317,7 @@ existing trigger if you wish to redefine it.
   limited to `INSERT`/`UPDATE`/`DELETE`/`SELECT`, and conditional logic should be
   handled through the `:where` option/method. Otherwise you'll likely run into
   trouble due to differences in syntax and supported features.
-* Manual `create_trigger` statements have some gotchas. See the section
+* Manual `ht_create_trigger` statements have some gotchas. See the section
   "Manual triggers and :compatibility"
 
 ## Contributing

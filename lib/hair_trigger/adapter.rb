@@ -1,6 +1,6 @@
 module HairTrigger
   module Adapter
-    def create_trigger(name = nil, options = {})
+    def ht_create_trigger(name = nil, options = {})
       if name.is_a?(Hash)
         options = name
         name = nil
@@ -8,7 +8,7 @@ module HairTrigger
       ::HairTrigger::Builder.new(name, options.merge(:execute => true, :adapter => self))
     end
 
-    def drop_trigger(name, table, options = {})
+    def ht_drop_trigger(name, table, options = {})
       ::HairTrigger::Builder.new(name, options.merge(:execute => true, :drop => true, :table => table, :adapter => self)).all{}
     end
 
