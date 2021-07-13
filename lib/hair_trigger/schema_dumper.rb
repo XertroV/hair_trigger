@@ -4,21 +4,21 @@ module HairTrigger
       def trailer(stream)
         orig_show_warnings = Builder.show_warnings
         Builder.show_warnings = false # we already show them when running the migration
-        triggers(stream)
+        ht_triggers(stream)
         super
       ensure
         Builder.show_warnings = orig_show_warnings
       end
     end
 
-    def triggers(stream)
+    def ht_triggers(stream)
       @adapter_name = @connection.adapter_name.downcase.to_sym
 
       all_triggers = @connection.triggers
       db_trigger_warnings = {}
       migration_trigger_builders = []
 
-      db_triggers = whitelist_triggers(all_triggers)
+      db_triggers = whitelist_ht_triggers(all_triggers)
 
       migration_triggers = HairTrigger.current_migrations(:in_rake_task => true, :previous_schema => self.class.previous_schema).map do |(_, builder)|
         definitions = []
@@ -28,7 +28,7 @@ module HairTrigger
             type = ($1 == ' FUNCTION' ? :function : :trigger)
             name = $2.gsub('"', '')
 
-            definitions << [name, statement, type]
+            # definitions << [name, statement, type]
           end
         end
         {:builder => builder, :definitions => definitions}
@@ -83,14 +83,14 @@ module HairTrigger
           test_name << '()'
           name << '()'
         end
-        definition = @connection.triggers(:only => [test_name], :simple_check => true).values.first
+        definition = @connection.ht_triggers(:only => [test_name], :simple_check => true).values.first
         definition.sub!(test_name, name)
         raise ActiveRecord::Rollback
       end
       definition
     end
 
-    def whitelist_triggers(triggers)
+    def whitelist_ht_triggers(triggers)
       triggers.reject do |name, source|
         ActiveRecord::SchemaDumper.ignore_tables.any? { |ignored_table_name| source =~ /ON\s+#{@connection.quote_table_name(ignored_table_name)}\s/ }
       end

@@ -7,15 +7,15 @@ require 'yaml'
 require 'shellwords'
 
 CONFIGS = YAML.load(ERB.new(File.read(File.expand_path(File.dirname(__FILE__) + '/../database.yml'))).result(binding))[ENV["DB_CONFIG"] || "test"]
-ADAPTERS = [:mysql2, :postgresql, :sqlite3]
+ADAPTERS = [:postgresql, :sqlite3]
 ADAPTERS.unshift :mysql if ActiveRecord::VERSION::STRING < "5"
 
 def each_adapter
   require 'active_record/connection_adapters/postgresql_adapter'
-  require 'active_record/connection_adapters/mysql_adapter' if ADAPTERS.include? :mysql
-  require 'active_record/connection_adapters/mysql2_adapter'
+  #require 'active_record/connection_adapters/mysql_adapter' if ADAPTERS.include? :mysql
+  #require 'active_record/connection_adapters/mysql2_adapter'
   require 'active_record/connection_adapters/sqlite3_adapter'
-  require 'mysql2'
+  #require 'mysql2'
 
   ADAPTERS.each do |adapter_name|
     context "under #{adapter_name}" do

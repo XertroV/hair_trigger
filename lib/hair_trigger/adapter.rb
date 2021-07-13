@@ -22,7 +22,7 @@ module HairTrigger
       "'#{@config[:username] || 'root'}'@'#{@config[:host] || 'localhost'}'"
     end
 
-    def triggers(options = {})
+    def ht_triggers(options = {})
       triggers = {}
       name_clause = options[:only] ? "IN ('" + options[:only].join("', '") + "')" : nil
       adapter_name = HairTrigger.adapter_name_for(self)
