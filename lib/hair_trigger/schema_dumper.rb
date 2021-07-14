@@ -14,7 +14,7 @@ module HairTrigger
     def ht_triggers(stream)
       @adapter_name = @connection.adapter_name.downcase.to_sym
 
-      all_triggers = @connection.triggers
+      all_triggers = @connection.ht_triggers
       db_trigger_warnings = {}
       migration_trigger_builders = []
 

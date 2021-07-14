@@ -111,7 +111,7 @@ shared_context "hairtrigger utils" do
   end
 
   def db_triggers
-    conn.triggers.values
+    conn.ht_triggers.values
   end
 
   def replace_file_contents(path, source, replacement)

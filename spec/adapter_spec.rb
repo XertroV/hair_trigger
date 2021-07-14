@@ -7,7 +7,7 @@ require 'spec_helper'
 describe "adapter" do
   include_context "hairtrigger utils"
 
-  describe ".triggers" do
+  describe ".ht_triggers" do
     before do
       reset_tmp(:migration_glob => "*initial_tables*")
       initialize_db
@@ -41,7 +41,7 @@ describe "adapter" do
           END
         SQL
 
-        expect(conn.triggers["foos_tr"]).to match(/CREATE TRIGGER foos_tr AFTER DELETE ON `users`/)
+        expect(conn.ht_triggers["foos_tr"]).to match(/CREATE TRIGGER foos_tr AFTER DELETE ON `users`/)
       end
     end
 
@@ -71,7 +71,7 @@ describe "adapter" do
           FOR EACH ROW EXECUTE PROCEDURE foos_tr();
         SQL
 
-        expect(conn.triggers["foos_tr"]).to match(/CREATE TRIGGER foos_tr AFTER DELETE ON "users"/)
+        expect(conn.ht_triggers["foos_tr"]).to match(/CREATE TRIGGER foos_tr AFTER DELETE ON "users"/)
       end
     end
 
@@ -87,7 +87,7 @@ describe "adapter" do
           END;
         SQL
 
-        expect(conn.triggers["foos_tr"]).to match(/CREATE TRIGGER foos_tr AFTER DELETE ON "users"/)
+        expect(conn.ht_triggers["foos_tr"]).to match(/CREATE TRIGGER foos_tr AFTER DELETE ON "users"/)
       end
     end
   end

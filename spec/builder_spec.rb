@@ -84,7 +84,7 @@ describe "builder" do
       triggers = builder.on(:foos){ |t|
         t.where('bar=1').name('bar'){ 'BAR;' }
         t.where('baz=1').name('baz'){ 'BAZ;' }
-      }.triggers
+      }.ht_triggers
       triggers.map(&:prepare!)
       triggers.map(&:prepared_name).should == ['bar', 'baz']
       triggers.map(&:prepared_where).should == ['bar=1', 'baz=1']

@@ -277,7 +277,7 @@ It will throw the appropriate errors/warnings so that you know what to fix,
 e.g.
 
 ```ruby
-User.triggers.each(&:validate!)
+User.ht_triggers.each(&:validate!)
 ```
 
 HairTrigger does not validate your SQL, so be sure to test it in all databases
